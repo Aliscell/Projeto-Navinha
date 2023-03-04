@@ -9,8 +9,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Entidades",
-    "path": "folders/Objetos/Entidades.yy",
+    "name": "Objetos de Fase",
+    "path": "folders/Objetos/Objetos de Fase.yy",
   },
   "parentObjectId": null,
   "persistent": false,

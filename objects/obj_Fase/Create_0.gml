@@ -3,12 +3,14 @@
 	//	Propriedades
 estadoDaFase = estados_fase.Bloqueada;
 numeroDaFase = 0;
+numeroDaCamada = 0;
 isPrincipal = false;
 isFinal = false;
 
 	// Dados
+//isAnteriorConcluida = false;
 ids_proximasFases = array_create(3, noone);
-//angulosConexoes = array_create(1, 3);
+//angulos = array_create(1, 3);
 
 	//	Aparência
 image_blend = c_white;
@@ -20,62 +22,16 @@ qtd_particulas = 0;
 
 #endregion
 
-
-//randomize();
-
-//Essa parte se tornou obsoleta, refazendo em um metodo
-/*
-if numeroDaFase == 0 {
-	
-	array_set(angulosConexoes, 0, irandom(359));
-	//show_message(string_concat("angulosConexoes 1: ", angulosConexoes[0]))
-	
-	array_push(angulosConexoes, irandom(359));
-	//show_message(string_concat("angulosConexoes 1: ", angulosConexoes[0], " | angulosConexoes 2: ", angulosConexoes[1]))
-	while(abs(angulosConexoes[1] - angulosConexoes[0]) <= 70 or abs(angulosConexoes[1] - angulosConexoes[0]) >= 290) {
-		angulosConexoes[1] += sign(angulosConexoes[1] - angulosConexoes[0]);
-	}
-	//show_message(string_concat("(CORRIGIDO) angulosConexoes 1: ", angulosConexoes[0], " | angulosConexoes 2: ", angulosConexoes[1]))
-	
-	array_push(angulosConexoes, irandom(359));
-	//show_message(string_concat("angulosConexoes 1: ", angulosConexoes[0], " | angulosConexoes 2: ", angulosConexoes[1], " | angulosConexoes 3: ", angulosConexoes[2]))
-	while(abs(angulosConexoes[2] - angulosConexoes[0]) <= 80 or abs(angulosConexoes[2] - angulosConexoes[1]) <= 80 or abs(angulosConexoes[2] - angulosConexoes[0]) >= 280 or abs(angulosConexoes[2] - angulosConexoes[1]) >= 280) {
-		angulosConexoes[2] += 10; 
-	}
-	//show_message(string_concat("(CORRIGIDO) angulosConexoes 1: ", angulosConexoes[0], " | angulosConexoes 2: ", angulosConexoes[1], " | angulosConexoes 3: ", angulosConexoes[2]))
-	
-	for(var i = 0; i < 3; i++){
-		var distancia = 60 + irandom(2)*10;
-		ids_proximasFases[i] = instance_create_layer(x + lengthdir_x(distancia, angulosConexoes[i]), y + lengthdir_y(distancia, angulosConexoes[i]), "Fases", obj_Fase, {
-			isPrincial : false,
-			numeroDaFase : 1,
-			estado : estados_fase.Bloqueada
-		});
-		
-		//array_set(ids_proximasFases, i, id_obj);
-		//show_message(string(id_obj));
-		//ids_proximasFases[i] = id_obj;
-		show_message(string(ids_proximasFases[i]));
-	}
-	
-	
-	//cria obrigatóriamente três mais fases
-} else {
-	if isPrincial {
-		//cria pelo menos uma continuação ou vira um final (se entre numero entre 3 e 5)
-	}
-	//pode criar no maximo mais 2 fases
-	
-	//se há alguma fase com o numeroDaFase diferente próximo, cria uma conecção
-}
-//*/
+randomize();
 
 
+#region CONSTRUTOR
 construtor = function(estadoDaFase, numeroDaFase, isPrincipal, anguloOrigem) {
 	
 	// 1. defini as caracteristicas básicas passadas
 	self.estadoDaFase = estadoDaFase;
 	self.numeroDaFase = numeroDaFase;
+	numeroDaCamada = numeroDaFase + isPrincipal;
 	self.isPrincipal = isPrincipal;
 	
 	/* 2. decide as caracteristicas avaçadas
@@ -84,14 +40,15 @@ construtor = function(estadoDaFase, numeroDaFase, isPrincipal, anguloOrigem) {
 	var quantidadeDeFases; //, quantidadeMinima;
 	switch(numeroDaFase) {
 		case 0:
-			quantidadeDeFases = 1 //3;
+			quantidadeDeFases = 3;
 			//quantidadeMinima = 3;
 		break;
 		
 		case 1:
 		case 2:
+			isFinal = true;
 			// pode gerar até no maximo três fases opicionalmente (minimo 1 se for principal)
-			quantidadeDeFases = 1 //choose(0, 1, 1, 2) + isPrincipal;
+			quantidadeDeFases = 0 //choose(0, 1, 1, 2) + isPrincipal;
 			//quantidadeMinima = 0 + isPrincipal;
 		break;
 		
@@ -106,39 +63,55 @@ construtor = function(estadoDaFase, numeroDaFase, isPrincipal, anguloOrigem) {
 	// 3. chamar metodo gerador de fases por aqui
 	if (quantidadeDeFases > 0) gerar_fases_adicionais(quantidadeDeFases, anguloOrigem);
 }
+#endregion
 
+
+#region GERADOR DE FASES ADICIONAIS
 gerar_fases_adicionais = function(quantidade, /*quantidadeMinima,*/ anguloOrigem) {
 	//ir testando aos poucos. Caso fique muito pesado, realizar todo o processo de forma lenta.
 	
 	
-	/* 1. escolhe um ângulo e checa se este é válido, se não tenta concertar
+	{/*}	1. Escolhe um ângulo e checa se este é válido, se não tenta concertar
 		.1 é valido se:
 			está dentro da tela;
 			não está na direção do angulo de origem; (se igual a -1, então não há origem)
 			não está com o ângulo proximo ao ângulo de outra fase;
 			não está muito próximo a outra fase
-		.2 guardar temporariamente esse ângulo para passar de anguloOrigem e compara-lo com os proximos*/
-	var angulos = array_create(quantidade, 0);
-	
-	
-	if (numeroDaFase == 0) {
-		angulos[0] = irandom(359);	
-	} else {
-		angulos[0] = anguloOrigem + 180 + irandom(35) * choose(-1, 1);
-	}
-	
-	/*
-	if (quantidade > 1) {
-		angulos[1] = irandom(359);
+		.2 guardar temporariamente esse ângulo para passar de anguloOrigem e compara-lo com os proximos
 		
-		while(abs(angulos[1] - angulos[0]) <= 70 or abs(angulos[1] - angulos[0]) >= 290) {
-			angulosConexoes[1] += sign(angulosConexoes[1] - angulosConexoes[0]);
-		}
+		//if (angulos[1] < 0 or angulos[1] > 359) angulos[1] -= sign(angulos[1]) * 360;
+		//if (angulos[2] < 0 or angulos[2] > 359) angulos[2] -= sign(angulos[2]) * 360;
+	*/}
+	
+	var angulos = array_create(quantidade, 0);
+	if (numeroDaFase == 0) {
+		angulos[0] = irandom(359);
+		angulos[1] = irandom_range(80, 150);
+		angulos[2] = irandom_range(90, 190 - (angulos[1]-80));
+		
+		var direcao = choose(-1, 1);
+		angulos[1] = angulos[0] + angulos[1] * direcao;
+		angulos[2] = angulos[0] + angulos[2] * -direcao;
+	} else {
+		
+		//Rascunho: cria os angulos de forma que:
+		//	Se for principal, obrigatoriamente vai para a proxima camada (explicado melhor no calculos da distância)
+		//	Se não, cria na camada atual ou (mais raramente) cria na próxima camada (dividindo espaço com o seu principal, caso haja)
+		
+		//angulos[0] = anguloOrigem + 180 + irandom(35) * choose(-1, 1);
+		
+		/*
+		if (quantidade > 1) { //possibilidade de transtormar em um for
+			
+			if(quantidade > 2) {
+				
+			}
+		}*/
 	}
-	*/
 	
 	for(var i = 0; i < quantidade; i++) {
-		// 2. decide caracteristicas básicas
+		/* 2. decide caracteristicas básicas
+			Caracteristicas da fase por exemplo*/
 	
 		/* 3. cria a fase definindo suas caracteristicas (usar metodo construtor)
 			.1 caracteristicas:
@@ -147,9 +120,19 @@ gerar_fases_adicionais = function(quantidade, /*quantidadeMinima,*/ anguloOrigem
 				estado (Bloqueado)
 				tipo de fase
 				...*/
-		var distancia = 60 + irandom_range(0 + numeroDaFase, 1 + numeroDaFase*2)*10;
+		
+		{/*}	Rascunho: Camadas de fase
+		Criar uma função em que a distancia seja medida tanto em relação a fase geradora quanto
+		a primeira (Raiz), fazendo assim a distância de todas as fases com mesmo numero N ou N-1,
+		mas sendo uma fase principal, seja relativamente próxima.
+		Com isso vai ser possivel dividir as fases em "grupos de camadas" que vão sendo liberadas
+		conforme você passa fases da "camada" anterior, impedindo o player de apenas avançar direto
+		em uma ramificação ignorando as fases anteriores.
+		*/}
+		var distancia = 60 + irandom_range(numeroDaFase*2, (numeroDaFase+1)*3)*10;
+		
 		ids_proximasFases[i] = instance_create_layer(x + lengthdir_x(distancia, angulos[i]), y + lengthdir_y(distancia, angulos[i]), "Fases", obj_Fase);
-		ids_proximasFases[i].construtor(estados_fase.Ativa, numeroDaFase+1, true, angulos[0]-180);
+		ids_proximasFases[i].construtor(estados_fase.Ativa, numeroDaFase+1, true, angulos[i]-180);
 		
 		//show_message(string(ids_proximasFases[i]));
 			
@@ -164,4 +147,4 @@ gerar_fases_adicionais = function(quantidade, /*quantidadeMinima,*/ anguloOrigem
 	}
 	
 }
-
+#endregion

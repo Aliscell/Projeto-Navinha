@@ -9,7 +9,7 @@ image_yscale = escala;
 var _velh = velh * min(.6 + escala, 1)
 var _velv = velv * min(.6 + escala, 1)
 
-move_and_collide(_velh, _velv * escala, Object3);
+move_and_collide(_velh, _velv * escala, obj_Entidade);
 
 
 /*

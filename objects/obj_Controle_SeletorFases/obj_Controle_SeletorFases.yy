@@ -10,8 +10,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Pasta",
-    "path": "folders/Objetos/Pasta.yy",
+    "name": "Obj's de Seleção de Fases",
+    "path": "folders/Objetos/Obj's de Seleção de Fases.yy",
   },
   "parentObjectId": null,
   "persistent": false,
