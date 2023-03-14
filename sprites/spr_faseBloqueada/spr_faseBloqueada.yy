@@ -24,16 +24,16 @@
   "height": 32,
   "HTile": false,
   "layers": [
-    {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"ba2598d4-3910-40a7-902a-1c01ab480d04","blendMode":0,"displayName":"Layer 3","isLocked":false,"opacity":75.0,"visible":true,},
-    {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"48987094-252d-4bbd-a6a2-7ef1bfa7cd7e","blendMode":0,"displayName":"default","isLocked":false,"opacity":89.0,"visible":true,},
+    {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"ba2598d4-3910-40a7-902a-1c01ab480d04","blendMode":0,"displayName":"Layer 3","isLocked":false,"opacity":80.0,"visible":true,},
+    {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"48987094-252d-4bbd-a6a2-7ef1bfa7cd7e","blendMode":0,"displayName":"default","isLocked":false,"opacity":90.0,"visible":true,},
     {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"81ec03a2-c743-4d9b-a7ff-5a782ae05337","blendMode":0,"displayName":"Layer 2","isLocked":false,"opacity":50.0,"visible":false,},
     {"resourceType":"GMImageLayer","resourceVersion":"1.0","name":"c15869b1-bbf6-4613-9c1e-4718db49db2c","blendMode":0,"displayName":"Layer 1","isLocked":false,"opacity":39.0,"visible":false,},
   ],
   "nineSlice": null,
   "origin": 4,
   "parent": {
-    "name": "Sprites",
-    "path": "folders/Sprites.yy",
+    "name": "Fases",
+    "path": "folders/Sprites/Fases.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

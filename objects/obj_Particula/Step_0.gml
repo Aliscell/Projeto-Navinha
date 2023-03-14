@@ -6,8 +6,8 @@ if !instance_position(x,y, pai) {
 image_xscale = escala;
 image_yscale = escala;
 
-var _velh = velh * min(.6 + escala, 1)
-var _velv = velv * min(.6 + escala, 1)
+var _velh = velh * min(.6 + escala, 1);
+var _velv = velv * min(.6 + escala, 1);
 
 move_and_collide(_velh, _velv * escala, obj_Entidade);
 

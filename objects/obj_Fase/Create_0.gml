@@ -1,144 +1,146 @@
 
 #region VARIÁVEIS
-	//	Propriedades
-estadoDaFase = estados_fase.Bloqueada;
+	//	Propriedades (Default)
+estadoDaFase = enum_estadosFase.Bloqueada;
 numeroDaFase = 0;
 numeroDaCamada = 0;
-isPrincipal = false;
+isPrincipal = true;
 isFinal = false;
 
 	// Dados
 //isAnteriorConcluida = false;
 ids_proximasFases = array_create(3, noone);
-//angulos = array_create(1, 3);
+//angulo = array_create(1, 3);
 
 	//	Aparência
 image_blend = c_white;
-image_index = random(image_number);
+image_index = random(image_number-1);
 crescendo = true;
 escala = choose(.8, .9, 1);
-qtd_particulas = 0;
-
-
+//qtd_particulas = 0;
 #endregion
 
 randomize();
 
 
+
 #region CONSTRUTOR
-construtor = function(estadoDaFase, numeroDaFase, isPrincipal, anguloOrigem) {
-	
-	// 1. defini as caracteristicas básicas passadas
-	self.estadoDaFase = estadoDaFase;
+construtor = function(numeroDaFase, isPrincipal, inversoOrigem) {
+	//*
+	if (numeroDaFase == 0) estadoDaFase = enum_estadosFase.Ativa;
 	self.numeroDaFase = numeroDaFase;
-	numeroDaCamada = numeroDaFase + isPrincipal;
+	numeroDaCamada = abs(get_camada(x, y));
 	self.isPrincipal = isPrincipal;
 	
-	/* 2. decide as caracteristicas avaçadas
-		quantas mais fases vai gerar (Se principal, gera pelo menos um ou fira fase final)
-		...*/
+	#region DECIDE QUANTAS FASES VAI GERAR
 	var quantidadeDeFases; //, quantidadeMinima;
-	switch(numeroDaFase) {
+	switch(numeroDaCamada) {
 		case 0:
-			quantidadeDeFases = 3;
+			quantidadeDeFases = 1//3;
 			//quantidadeMinima = 3;
 		break;
 		
-		case 1:
-		case 2:
-			isFinal = true;
-			// pode gerar até no maximo três fases opicionalmente (minimo 1 se for principal)
-			quantidadeDeFases = 0 //choose(0, 1, 1, 2) + isPrincipal;
-			//quantidadeMinima = 0 + isPrincipal;
+		case 1: //Só gera uma fase extra e quando houver espaço o suficiente
+			isFinal = true //false;
+			
+			quantidadeDeFases = 1; //2;
+			//quantidadeMinima = isPrincipal;
 		break;
 		
+		case 2: //Pode gerar até no maximo duas fases (+1 se for principal) opicionalmente (minimo 1 se for principal)
 		case 3:
-			// obrigatoriamente acaba (se for principal vira uma BossBattle)
-			isFinal = true;
-			quantidadeDeFases = 0;
-			//quantidadeMinima = 0;
+			isFinal = false;
+			
+			quantidadeDeFases = 1; //irandom(numeroDaFase-1) + isPrincipal;
+			//quantidadeMinima = numeroDaFase-2 + isPrincipal;
 		break;
+		
+		case 4: // obrigatoriamente acaba (se for principal vira uma BossBattle)
+			isFinal = true; //if (isPrincipal) isFinal = true
+		break; 
 	}
+	#endregion
 	
-	// 3. chamar metodo gerador de fases por aqui
-	if (quantidadeDeFases > 0) gerar_fases_adicionais(quantidadeDeFases, anguloOrigem);
+	// 3. Procurar ao redor se há fases com um número diferente do seu para se conectarem
+	//collision_circle(x,y, aumentaDependendoDaCamada, obj_Fase, false, true);
+	
+	if (!isFinal) and (quantidadeDeFases > 0) gerar_fases_adicionais(quantidadeDeFases, inversoOrigem);
+	//*/
 }
 #endregion
 
-
 #region GERADOR DE FASES ADICIONAIS
-gerar_fases_adicionais = function(quantidade, /*quantidadeMinima,*/ anguloOrigem) {
-	//ir testando aos poucos. Caso fique muito pesado, realizar todo o processo de forma lenta.
+gerar_fases_adicionais = function(quantidade, inversoOrigem) {	
+	var angulo = array_create(quantidade, 0);
+	var distancia = array_create(quantidade, 0);
 	
-	
-	{/*}	1. Escolhe um ângulo e checa se este é válido, se não tenta concertar
-		.1 é valido se:
-			está dentro da tela;
-			não está na direção do angulo de origem; (se igual a -1, então não há origem)
-			não está com o ângulo proximo ao ângulo de outra fase;
-			não está muito próximo a outra fase
-		.2 guardar temporariamente esse ângulo para passar de anguloOrigem e compara-lo com os proximos
-		
-		//if (angulos[1] < 0 or angulos[1] > 359) angulos[1] -= sign(angulos[1]) * 360;
-		//if (angulos[2] < 0 or angulos[2] > 359) angulos[2] -= sign(angulos[2]) * 360;
-	*/}
-	
-	var angulos = array_create(quantidade, 0);
 	if (numeroDaFase == 0) {
-		angulos[0] = irandom(359);
-		angulos[1] = irandom_range(80, 150);
-		angulos[2] = irandom_range(90, 190 - (angulos[1]-80));
+		angulo[0] = irandom(359); /*
+		angulo[1] = irandom_range(80, 150);
+		angulo[2] = irandom_range(90, 190 - (angulo[1]-80));
 		
 		var direcao = choose(-1, 1);
-		angulos[1] = angulos[0] + angulos[1] * direcao;
-		angulos[2] = angulos[0] + angulos[2] * -direcao;
+		angulo[1] = angulo[0] + angulo[1] * direcao;
+		angulo[2] = angulo[0] + angulo[2] * -direcao;
+		
+		if (direcao == 1) angulo[2] += 360;
+		else angulo[1] += 360;//*/
+		for(var i = 0; i < quantidade; i++) distancia[i] = 60 + irandom(3)*10;
 	} else {
-		
-		//Rascunho: cria os angulos de forma que:
-		//	Se for principal, obrigatoriamente vai para a proxima camada (explicado melhor no calculos da distância)
-		//	Se não, cria na camada atual ou (mais raramente) cria na próxima camada (dividindo espaço com o seu principal, caso haja)
-		
-		//angulos[0] = anguloOrigem + 180 + irandom(35) * choose(-1, 1);
-		
-		/*
-		if (quantidade > 1) { //possibilidade de transtormar em um for
+		{/*}	Rascunho
+			Se é principal, primeiro angulo para a próxima camada
+			for(var i = isPrincipal; i < quantidade; i++)
+				Decide entre essa camada e próxima (quando possivel)
+				Escolhe um angulo baseado no calculo correto
+				Se não existir angulo que se encaixe, desiste e parte para a proxima tentativa
 			
-			if(quantidade > 2) {
+			
+			Calculo para próxima camada: angulo[i] = InversoAnguloOrigem + irandom(40) * choose(-1, 1) - 10 * (sentidoRaiz) + K;
+				Sendo: sentidoRaiz = sentido que leva para a fase raiz (fase 0)
+				Sendo: K = angulo necessario para não levar para fora da tela (só relevante a partir da camada 3 eu acho)
+			
+			Calculo para camada atual: angulo[i] = ?
+				Rascunho: tomando a direcao para a fase raiz como o angulo 0, o angulo para a proxima fase deverá ser esse "0" mais
+				um intervalo [70,140](?), porém deve está dentro da camada e não pode está a menos que 100(?) graus do anguloOrigem 
+		*/}
+		
+		if (isPrincipal) {
+			
+			var direcaoRaiz = point_direction(x,y, room_width/2,room_height/2);
+			//var sentidoRaiz = sign(inversoOrigem - direcaoRaiz);
+			//if (abs(inversoOrigem - direcaoRaiz) < 180) sentidoRaiz = -sentidoRaiz;
+			var sentidoRaiz = (abs(inversoOrigem - direcaoRaiz) < 180) ? -sign(inversoOrigem - direcaoRaiz) : sign(inversoOrigem - direcaoRaiz);
+			
+			angulo[0] = inversoOrigem + irandom(40) * choose(-1, 1) - 20 * (sentidoRaiz); //+ K;
+			
+			var passos_min = 0;
+			var passos_max = 0;
+			do {
+				passos_max++;
 				
-			}
-		}*/
+				var _x = x + lengthdir_x(passos_max*10, angulo[0]);
+				var _y = y + lengthdir_y(passos_max*10, angulo[0]);
+				var camadaDestino = get_camada(_x, _y);
+				
+				if (abs(camadaDestino) <= numeroDaCamada) passos_min++;
+			} until(camadaDestino <= -(numeroDaCamada+1)) or (numeroDaCamada+1 < camadaDestino);
+			passos_min = max(passos_min+1, 6 + numeroDaCamada);
+			passos_max--; //= min(passos_max-1, 3 * power(2, numeroDaCamada+1));
+			
+			distancia[0] = irandom_range(passos_min, passos_max)*10;
+		}
+		
+		/*for(var i = isPrincipal; i < quantidade - isPrincipal; i++) {
+			//Cuida do resto das fases: usa o metodo comentado(*) assim
+		}*/	
 	}
 	
 	for(var i = 0; i < quantidade; i++) {
-		/* 2. decide caracteristicas básicas
-			Caracteristicas da fase por exemplo*/
-	
-		/* 3. cria a fase definindo suas caracteristicas (usar metodo construtor)
-			.1 caracteristicas:
-				é principal
-				numero (distancia da origem)
-				estado (Bloqueado)
-				tipo de fase
-				...*/
+		var _x = x + lengthdir_x(distancia[i], angulo[i]);
+		var _y = y + lengthdir_y(distancia[i], angulo[i]);
 		
-		{/*}	Rascunho: Camadas de fase
-		Criar uma função em que a distancia seja medida tanto em relação a fase geradora quanto
-		a primeira (Raiz), fazendo assim a distância de todas as fases com mesmo numero N ou N-1,
-		mas sendo uma fase principal, seja relativamente próxima.
-		Com isso vai ser possivel dividir as fases em "grupos de camadas" que vão sendo liberadas
-		conforme você passa fases da "camada" anterior, impedindo o player de apenas avançar direto
-		em uma ramificação ignorando as fases anteriores.
-		*/}
-		var distancia = 60 + irandom_range(numeroDaFase*2, (numeroDaFase+1)*3)*10;
-		
-		ids_proximasFases[i] = instance_create_layer(x + lengthdir_x(distancia, angulos[i]), y + lengthdir_y(distancia, angulos[i]), "Fases", obj_Fase);
-		ids_proximasFases[i].construtor(estados_fase.Ativa, numeroDaFase+1, true, angulos[i]-180);
-		
-		//show_message(string(ids_proximasFases[i]));
-			
-		// 4. Procurar ao redor se há fases com um número diferente do seu para se conectarem
-			
-		// 5. repetir o processo pelo numero de vezes passado
+		ids_proximasFases[i] = instance_create_layer(_x, _y, "Fases", obj_Fase);
+		ids_proximasFases[i].construtor(numeroDaFase+1, true, angulo[i]);
 	}
 	
 	for(var i = array_length(ids_proximasFases)-1; i >= 0; i--) {
@@ -148,3 +150,51 @@ gerar_fases_adicionais = function(quantidade, /*quantidadeMinima,*/ anguloOrigem
 	
 }
 #endregion
+
+/*
+#region 
+geraAngulo = function(inversoOrigem, proximaCamada) {
+	checaEmVolta = function() {
+		var _array = [];
+		
+		for(var i = 0; i < 18; i++) {
+			var _x = lengthdir_x(50, i*20);
+			var _y = lengthdir_y(50, i*20);
+			
+			if (get_camada(_x, _y) == numeroDaCamada) and (!collision_circle(_x,_y,50, obj_Fase, false, true)) array_insert(_array, array_length(_array), i);
+		}
+		
+		return choose(_array)
+	}
+
+	var direcaoRaiz = point_direction(x,y, room_width/2,room_height/2);
+	//var sentidoRaiz = sign(inversoOrigem - direcaoRaiz);
+	//if (abs(inversoOrigem - direcaoRaiz) < 180) sentidoRaiz = - sentidoRaiz;
+	var sentidoRaiz = (abs(inversoOrigem - direcaoRaiz) < 180) ? -sign(inversoOrigem - direcaoRaiz) : sign(inversoOrigem - direcaoRaiz);
+	
+	//Muda a forma de pegar o angulo conforme a inteção
+	if(proximaCamada) var angulo = inversoOrigem + irandom(40) * choose(-1, 1) - 20 * (sentidoRaiz); //+ K;
+	else var angulo = checaEmVolta();
+		
+	return angulo;
+}
+
+geraDistancia = function(proximaCamada) {
+	var passos_min = 0;
+	var passos_max = 0;
+	do {
+		passos_max++;
+				
+		var _x = x + lengthdir_x(passos_max*10, angulo[0]);
+		var _y = y + lengthdir_y(passos_max*10, angulo[0]);
+		var camadaDestino = get_camada(_x, _y);
+				
+		if (abs(camadaDestino) <= numeroDaCamada) passos_min++;
+	} until(camadaDestino <= -(numeroDaCamada+1)) or (numeroDaCamada+1 < camadaDestino);
+	passos_min = max(passos_min+1, 6 + numeroDaCamada);
+	passos_max--; //= min(passos_max-1, 3 * power(2, numeroDaCamada+1));
+			
+	distancia[0] = irandom_range(passos_min, passos_max)*10;
+}
+#endregion
+

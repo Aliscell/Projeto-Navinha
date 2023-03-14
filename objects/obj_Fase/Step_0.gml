@@ -1,5 +1,8 @@
 
 
+
+//if (mouse_check_button_pressed(mb_left)) get_camada(mouse_x, mouse_y);
+
 #region Transformação
 image_angle -= .5;
 
