@@ -29,7 +29,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "spr_fase",
+    "path": "sprites/spr_fase/spr_fase.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }

@@ -22,7 +22,7 @@ if exibir_camadas {
 	
 		draw_set_color(c_red);
 	
-		var raio = 20 * power(2, i+2) + (i+2) * 20 - power(2, i+1) * 10
+		var raio = 20 * power(2, i+2) + (i+2) * 20 - power(2, i+1) * 5
 		draw_circle(_x,_y, raio, true);
 	}
 	draw_set_color(-1);

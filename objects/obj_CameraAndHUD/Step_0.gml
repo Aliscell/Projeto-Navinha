@@ -1,8 +1,7 @@
 
-//var _x = room_width/2;
+#region MOVIMENTAÇÃO DA CÃMERA
+//x_camera = map_value(x_do_player, 0,0, 0,320); //meio da tela = 160;
+//x_camera = clamp(x_camera, 0, 320);
 
-//var x_camera_dest = map_value(id_cursorAux.x, _x-128, _x+128, 384, room_width-384);
-//x_camera = clamp(lerp(x_camera, x_camera_dest, .5), 384, room_width-384);
-
-//camera_set_view_pos(view_get_camera(view_camera[0]), x_camera-384, 0);
-
+//camera_set_view_pos(view_get_camera(view_camera[0]), 0,0);
+#endregion
